@@ -1,2 +1,2 @@
 # HungCoders
-Online IDEs- Flutlab.io  &  DartPad (add more if you find better)
+Online IDEs for Flutter dev- Flutlab.io  &  DartPad (add more if you find better)
