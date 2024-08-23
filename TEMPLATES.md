@@ -5,4 +5,4 @@
 - Affinity Map --> https://excalidraw.com/#json=88oAVMizenS6skq-4xUa3,OWkByS8R07yXcoZSU0Y3HA
 - Storyboarding --> https://excalidraw.com/#json=nBNenbpiH3dfbMvT5UpSw,4SPXcxb4IZ10yt-QlXUH5w
 - Journey Mapping --> https://excalidraw.com/#json=AxeLMtM506gFhc0SC8X1m,NzHl1Z17XhdeTfqZul8bTg   and   https://excalidraw.com/#json=bPVUugPfdAC792OsPm1x3,j1xLJGZF1H4NR2WpquQnlA (Rough)
-- https://excalidraw.com/#json=9z_he3HRLIN0i2M10_DHl,0chIzC6aIX7Jr93SNMwalg
+- Value Proposition --> https://excalidraw.com/#json=9z_he3HRLIN0i2M10_DHl,0chIzC6aIX7Jr93SNMwalg
