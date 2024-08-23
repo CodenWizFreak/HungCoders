@@ -4,3 +4,4 @@
 - Impact Effort --> https://excalidraw.com/#json=Ci1af_llaxioXS3DQZzB_,dzPt6jlV-HZH_3qROSQeeQ
 - Affinity Map --> https://excalidraw.com/#json=88oAVMizenS6skq-4xUa3,OWkByS8R07yXcoZSU0Y3HA
 - Storyboarding --> https://excalidraw.com/#json=nBNenbpiH3dfbMvT5UpSw,4SPXcxb4IZ10yt-QlXUH5w
+- Journey Mapping --> https://excalidraw.com/#json=AxeLMtM506gFhc0SC8X1m,NzHl1Z17XhdeTfqZul8bTg (Rough)
