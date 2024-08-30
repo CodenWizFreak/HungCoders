@@ -140,3 +140,95 @@ class Dot extends StatelessWidget {
     );
   }
 }
+
+
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: WaveAnimation(),
+    );
+  }
+}
+
+class WaveAnimation extends StatefulWidget {
+  @override
+  _WaveAnimationState createState() => _WaveAnimationState();
+}
+
+class _WaveAnimationState extends State<WaveAnimation> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  Path _path = Path();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            _path.reset();
+            for (int i = 0; i < 360; i++) {
+              double x = i.toDouble();
+              double y = 100 + sin((x + _controller.value * 360) * pi / 180) * 50;
+              if (i == 0) {
+                _path.moveTo(x, y);
+              } else {
+                _path.lineTo(x, y);
+              }
+            }
+            return CustomPaint(
+              painter: WavePainter(_path),
+              child: Container(
+                width: 360,
+                height: 200,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class WavePainter extends CustomPainter {
+  Path _path;
+
+  WavePainter(this._path);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    canvas.drawPath(_path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
