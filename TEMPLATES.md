@@ -8,4 +8,8 @@
 - Value Proposition --> https://excalidraw.com/#json=9z_he3HRLIN0i2M10_DHl,0chIzC6aIX7Jr93SNMwalg
 
 **Update Journey mapping by connecting it with a user.
-**
+**Increase the font size of Value Proposition
+
+![Screenshot 2024-08-30 140728](https://github.com/user-attachments/assets/6e3d8f58-12ff-4197-adc3-5c2621716a01)
+![Screenshot 2024-08-30 140738](https://github.com/user-attachments/assets/47c37d03-1228-41b0-8fef-18f2a63c12f3)
+![Screenshot 2024-08-30 140758](https://github.com/user-attachments/assets/6bcead51-e943-4d52-b68d-8c7b2cd8abf0)
