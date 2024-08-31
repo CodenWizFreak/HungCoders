@@ -6,5 +6,10 @@ Online IDEs for Flutter dev
    
 (add more if you find better)
 
+## Progress:
+- Sign in/Sign up frontend done
 
+## In process:
+- Firebase Auth0 authentication and user login
+- Spotify API fetching
  
