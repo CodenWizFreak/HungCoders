@@ -1,29 +1,27 @@
 import 'dart:math';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'signup_page.dart'; // Ensure this path is correct
-import 'package:crest/authLogic/auth_logic.dart'; // Import authentication logic
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'signup.dart'; // Ensure this path is correct based on your project structure
+import 'package:uni_links/uni_links.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+void main() {
+  runApp(MyApp());
+}
 
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Crest',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.purple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const LoginScreen(),
+      home: LoginScreen(),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -35,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen>
   late TextEditingController _passwordController;
   late bool _isEmailValid;
   late bool _isPasswordValid;
-  final AuthService _authService = AuthService(); // Initialize AuthService
 
   @override
   void initState() {
@@ -51,6 +48,8 @@ class _LoginScreenState extends State<LoginScreen>
 
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
+
+    _initUniLinks();
   }
 
   void _validateEmail() {
@@ -75,47 +74,39 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  Future<void> _login() async {
-    if (_isEmailValid && _isPasswordValid) {
-      String email = _emailController.text;
-      String password = _passwordController.text;
-
-      User? user = await _authService.signIn(email, password);
-      if (user != null) {
-        // Navigate to home screen or show success message
-        print('Login successful');
-        Navigator.pushReplacementNamed(
-            context, '/home'); // Replace with your home screen route
-      } else {
-        print('Login failed');
-        _showErrorDialog('Login Failed', 'Invalid email or password.');
+  void _initUniLinks() async {
+    try {
+      final initialLink = await getInitialLink();
+      if (initialLink != null) {
+        Uri uri = Uri.parse(initialLink);
+        if (uri.path == '/login') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        }
       }
-    } else {
-      _showErrorDialog(
-          'Invalid Input', 'Please check your email and password.');
-    }
-  }
 
-  void _showErrorDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+      linkStream.listen((String? link) {
+        if (link != null) {
+          Uri uri = Uri.parse(link);
+          if (uri.path == '/login') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginScreen()),
+            );
+          }
+        }
+      });
+    } catch (e) {
+      // Handle error
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color(0xff000000),
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -146,81 +137,83 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       'CREST',
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.yellow,
+                        color: Color(0xffad62fc),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
+                    SizedBox(height: 10),
+                    Text(
                       'Ride the Peak of Sound',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(height: 20),
+                    Text(
                       'Welcome Back',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon:
-                            const Icon(Icons.email, color: Colors.black),
+                        prefixIcon: Icon(Icons.email, color: Colors.black),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: const Color(0xffffffff),
+                        fillColor: Color(0xffffffff),
                         errorText: _isEmailValid ? null : 'Invalid email',
                       ),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Color(0xff000000)),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        prefixIcon:
-                            const Icon(Icons.lock, color: Color(0xff000000)),
+                        prefixIcon: Icon(Icons.lock, color: Color(0xff000000)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: const Color(0xffffffff),
+                        fillColor: Color(0xffffffff),
                         errorText: _isPasswordValid
                             ? null
                             : 'Password must be at least 8 characters',
                       ),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Color(0xff000000)),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
-                        onPressed: _login, // Use the _login method
-                        child: const Text('Login'),
+                        onPressed: () {
+                          if (_isEmailValid && _isPasswordValid) {
+                            // Handle login action
+                          }
+                        },
+                        child: Text('Login'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.yellow,
+                          backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                               vertical: 15, horizontal: 30),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     Center(
                       child: TextButton(
                         onPressed: () {
@@ -231,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen>
                           );
                         },
                         child: RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: <TextSpan>[
                               TextSpan(
                                 text: 'Don\'t have an account? ',
@@ -240,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen>
                               TextSpan(
                                 text: 'Sign Up',
                                 style: TextStyle(
-                                  color: Colors.yellow,
+                                  color: Color(0xffad62fc),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -268,12 +261,12 @@ class SoundWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.yellow
+      ..color = Color(0xffad62fc)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    const double amplitude = 20.0; // Increased amplitude
-    const double frequency = 0.02;
+    final double amplitude = 20.0; // Increased amplitude
+    final double frequency = 0.02;
     final double phaseShift = waveOffset;
 
     final Path path = Path();
