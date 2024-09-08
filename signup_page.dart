@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:crest/authLogic/auth_signup.dart'; // Import authentication logic
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class _SignUpPageState extends State<SignUpPage>
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
+  final AuthService _authService = AuthService(); // Use the AuthService
   late bool _isEmailValid;
   late bool _isPasswordValid;
   late bool _isConfirmPasswordValid;
@@ -45,7 +47,7 @@ class _SignUpPageState extends State<SignUpPage>
   void _validatePassword() {
     final password = _passwordController.text;
     setState(() {
-      _isPasswordValid = password.length >= 8; // Example password restriction
+      _isPasswordValid = password.length >= 8;
     });
   }
 
@@ -64,6 +66,31 @@ class _SignUpPageState extends State<SignUpPage>
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _signUpWithEmail() async {
+    if (_isEmailValid && _isPasswordValid && _isConfirmPasswordValid) {
+      final userCredential = await _authService.signUpWithEmail(
+        _emailController.text,
+        _passwordController.text,
+      );
+      if (userCredential != null) {
+        // Handle successful sign up, e.g., navigate to another screen
+      } else {
+        print('Failed to sign up with email');
+      }
+    } else {
+      print('Invalid input');
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    final userCredential = await _authService.signUpWithGoogle();
+    if (userCredential != null) {
+      // Handle successful sign up, e.g., navigate to another screen
+    } else {
+      print('Failed to sign up with Google');
+    }
   }
 
   @override
@@ -86,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage>
                       painter: SoundWavePainter(
                         waveOffset: _controller.value * 2 * pi,
                       ),
-                      size: Size(double.infinity, 200),
+                      size: const Size(double.infinity, 200),
                     );
                   },
                 ),
@@ -101,7 +128,7 @@ class _SignUpPageState extends State<SignUpPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'CREST',
                       style: TextStyle(
                         fontSize: 36,
@@ -109,102 +136,115 @@ class _SignUpPageState extends State<SignUpPage>
                         color: Colors.yellow,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Ride the Peak of Sound',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon: Icon(Icons.email, color: Color(0xff000000)),
+                        prefixIcon:
+                            const Icon(Icons.email, color: Color(0xff0f0f0f)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Color(0xffffffff),
+                        fillColor: const Color(0xfffdfbfb),
                         errorText: _isEmailValid ? null : 'Invalid email',
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Color(0xff0f0f0f)),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock, color: Color(0xff000000)),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Color(0xff000000)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Color(0xffffffff),
+                        fillColor: const Color(0xffffffff),
                         errorText: _isPasswordValid
                             ? null
                             : 'Password must be at least 8 characters',
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Color(0xff0f0f0f)),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _confirmPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
-                        prefixIcon: Icon(Icons.lock, color: Color(0xff000000)),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Color(0xff000000)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
-                        fillColor: Color(0xffffffff),
+                        fillColor: const Color(0xffffffff),
                         errorText: _isConfirmPasswordValid
                             ? null
                             : 'Passwords do not match',
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Color(0xff0c0c0c)),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_isEmailValid &&
-                              _isPasswordValid &&
-                              _isConfirmPasswordValid) {
-                            // Handle sign-up action
-                          }
-                        },
-                        child: Text('Sign Up'),
+                        onPressed: _signUpWithEmail,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               vertical: 15, horizontal: 30),
                         ),
+                        child: const Text('Sign Up with Email'),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _signUpWithGoogle,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.red, // Google Sign-In button color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 30),
+                        ),
+                        child: const Text('Sign Up with Google'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     Center(
                       child: TextButton(
                         onPressed: () {
                           Navigator.pop(context); // Go back to login screen
                         },
                         child: RichText(
-                          text: TextSpan(
+                          text: const TextSpan(
                             children: <TextSpan>[
                               TextSpan(
                                 text: 'Already have an account? ',
