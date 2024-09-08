@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:crest/authLogic/auth_signup.dart'; // Import authentication logic
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -11,12 +10,14 @@ class _SignUpPageState extends State<SignUpPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late TextEditingController _emailController;
+  late TextEditingController _phoneController;
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
-  final AuthService _authService = AuthService(); // Use the AuthService
   late bool _isEmailValid;
+  late bool _isPhoneValid;
   late bool _isPasswordValid;
   late bool _isConfirmPasswordValid;
+  bool _isEmailSelected = true; // Toggle between email and phone
 
   @override
   void initState() {
@@ -26,13 +27,16 @@ class _SignUpPageState extends State<SignUpPage>
       vsync: this,
     )..repeat();
     _emailController = TextEditingController();
+    _phoneController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _isEmailValid = true;
+    _isPhoneValid = true;
     _isPasswordValid = true;
     _isConfirmPasswordValid = true;
 
     _emailController.addListener(_validateEmail);
+    _phoneController.addListener(_validatePhone);
     _passwordController.addListener(_validatePassword);
     _confirmPasswordController.addListener(_validateConfirmPassword);
   }
@@ -44,10 +48,18 @@ class _SignUpPageState extends State<SignUpPage>
     });
   }
 
+  void _validatePhone() {
+    final phone = _phoneController.text;
+    setState(() {
+      _isPhoneValid =
+          RegExp(r'^\d{10}$').hasMatch(phone); // Validates 10-digit number
+    });
+  }
+
   void _validatePassword() {
     final password = _passwordController.text;
     setState(() {
-      _isPasswordValid = password.length >= 8;
+      _isPasswordValid = password.length >= 8; // Example password restriction
     });
   }
 
@@ -63,34 +75,10 @@ class _SignUpPageState extends State<SignUpPage>
   void dispose() {
     _controller.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _signUpWithEmail() async {
-    if (_isEmailValid && _isPasswordValid && _isConfirmPasswordValid) {
-      final userCredential = await _authService.signUpWithEmail(
-        _emailController.text,
-        _passwordController.text,
-      );
-      if (userCredential != null) {
-        // Handle successful sign up, e.g., navigate to another screen
-      } else {
-        print('Failed to sign up with email');
-      }
-    } else {
-      print('Invalid input');
-    }
-  }
-
-  Future<void> _signUpWithGoogle() async {
-    final userCredential = await _authService.signUpWithGoogle();
-    if (userCredential != null) {
-      // Handle successful sign up, e.g., navigate to another screen
-    } else {
-      print('Failed to sign up with Google');
-    }
   }
 
   @override
@@ -113,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage>
                       painter: SoundWavePainter(
                         waveOffset: _controller.value * 2 * pi,
                       ),
-                      size: const Size(double.infinity, 200),
+                      size: Size(double.infinity, 200),
                     );
                   },
                 ),
@@ -128,123 +116,100 @@ class _SignUpPageState extends State<SignUpPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       'CREST',
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.yellow,
+                        color: Color(0xffad62fc),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
+                    SizedBox(height: 10),
+                    Text(
                       'Ride the Peak of Sound',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(height: 20),
+                    Text(
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon:
-                            const Icon(Icons.email, color: Color(0xff0f0f0f)),
-                        border: OutlineInputBorder(
+                    SizedBox(height: 40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ToggleButtons(
+                          isSelected: [_isEmailSelected, !_isEmailSelected],
+                          onPressed: (index) {
+                            setState(() {
+                              _isEmailSelected = index == 0;
+                            });
+                          },
+                          color: Colors.white,
+                          selectedColor: Color(0xffad62fc),
+                          fillColor: Colors.black,
                           borderRadius: BorderRadius.circular(12),
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Text('Email'),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: Text('Phone No.'),
+                            ),
+                          ],
                         ),
-                        filled: true,
-                        fillColor: const Color(0xfffdfbfb),
-                        errorText: _isEmailValid ? null : 'Invalid email',
-                      ),
-                      style: const TextStyle(color: Color(0xff0f0f0f)),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon:
-                            const Icon(Icons.lock, color: Color(0xff000000)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xffffffff),
-                        errorText: _isPasswordValid
-                            ? null
-                            : 'Password must be at least 8 characters',
-                      ),
-                      style: const TextStyle(color: Color(0xff0f0f0f)),
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child: _isEmailSelected
+                          ? buildEmailInput()
+                          : buildPhoneInput(),
                     ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        prefixIcon:
-                            const Icon(Icons.lock, color: Color(0xff000000)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xffffffff),
-                        errorText: _isConfirmPasswordValid
-                            ? null
-                            : 'Passwords do not match',
-                      ),
-                      style: const TextStyle(color: Color(0xff0c0c0c)),
-                    ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
+                    buildPasswordInput(),
+                    SizedBox(height: 20),
+                    buildConfirmPasswordInput(),
+                    SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
-                        onPressed: _signUpWithEmail,
+                        onPressed: () {
+                          if ((_isEmailSelected && _isEmailValid) ||
+                              (!_isEmailSelected && _isPhoneValid) &&
+                                  _isPasswordValid &&
+                                  _isConfirmPasswordValid) {
+                            // Handle sign-up action
+                          }
+                        },
+                        child: Text('Sign Up'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.yellow,
+                          backgroundColor: Color(0xffffffff),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                               vertical: 15, horizontal: 30),
                         ),
-                        child: const Text('Sign Up with Email'),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _signUpWithGoogle,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Colors.red, // Google Sign-In button color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 30),
-                        ),
-                        child: const Text('Sign Up with Google'),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     Center(
                       child: TextButton(
                         onPressed: () {
                           Navigator.pop(context); // Go back to login screen
                         },
                         child: RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: <TextSpan>[
                               TextSpan(
                                 text: 'Already have an account? ',
@@ -253,7 +218,7 @@ class _SignUpPageState extends State<SignUpPage>
                               TextSpan(
                                 text: 'Login',
                                 style: TextStyle(
-                                  color: Colors.yellow,
+                                  color: Color(0xffad62fc),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -271,6 +236,80 @@ class _SignUpPageState extends State<SignUpPage>
       ),
     );
   }
+
+  Widget buildEmailInput() {
+    return TextField(
+      key: ValueKey('email'),
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        prefixIcon: Icon(Icons.email, color: Color(0xff000000)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Color(0xffffffff),
+        errorText: _isEmailValid ? null : 'Invalid email',
+      ),
+      style: TextStyle(color: Colors.white),
+    );
+  }
+
+  Widget buildPhoneInput() {
+    return TextField(
+      key: ValueKey('phone'),
+      controller: _phoneController,
+      decoration: InputDecoration(
+        labelText: 'Phone No.',
+        prefixIcon: Icon(Icons.phone, color: Color(0xff000000)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Color(0xffffffff),
+        errorText: _isPhoneValid ? null : 'Invalid phone number',
+      ),
+      style: TextStyle(color: Colors.white),
+      keyboardType: TextInputType.phone,
+    );
+  }
+
+  Widget buildPasswordInput() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: Icon(Icons.lock, color: Color(0xff000000)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Color(0xffffffff),
+        errorText:
+            _isPasswordValid ? null : 'Password must be at least 8 characters',
+      ),
+      style: TextStyle(color: Colors.white),
+    );
+  }
+
+  Widget buildConfirmPasswordInput() {
+    return TextField(
+      controller: _confirmPasswordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Confirm Password',
+        prefixIcon: Icon(Icons.lock, color: Color(0xff000000)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Color(0xffffffff),
+        errorText: _isConfirmPasswordValid ? null : 'Passwords do not match',
+      ),
+      style: TextStyle(color: Colors.white),
+    );
+  }
 }
 
 class SoundWavePainter extends CustomPainter {
@@ -281,7 +320,7 @@ class SoundWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.yellow
+      ..color = Color(0xffad62fc)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
