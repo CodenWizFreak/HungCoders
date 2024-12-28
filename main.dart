@@ -84,3 +84,57 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+//App B
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Get Firebase token for App B
+    _firebaseMessaging.getToken().then((token) {
+      print("App B Firebase Token: $token");
+    });
+
+    // Handle messages when app is in the foreground
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Message from App A: ${message.notification?.title}');
+      // Handle the message accordingly
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('App B')),
+      body: Center(
+        child: Text('Waiting for message from App A...'),
+      ),
+    );
+  }
+}
