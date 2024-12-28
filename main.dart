@@ -66,7 +66,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // Send a message to App B (via Firebase Cloud Messaging)
   Future<void> sendMessageToAppB() async {
     // Implement your API call or Firebase function here to send the message.
-    // Example method (just placeholder for demonstration):
     print('Sending message to App B...');
   }
 
